@@ -1,0 +1,11 @@
+jupyter
+jupyter_contrib_nbextensions
+jupyter_nbextensions_configurator
+cython
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+statsmodels
+scikit-learn
