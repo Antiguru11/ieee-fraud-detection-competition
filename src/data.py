@@ -86,6 +86,9 @@ class DataFramesCollection(object):
 		else:
 			print('{} DataFrame(s) optimized'.format(cnt))
 
+	def __iter__(self):
+		return iter([self.__getattr__(name) for name in self.names])
+
 	def __getattr__(self, item):
 		df_item = self.data_frames.get(item, None)
 		if df_item.data is None:
@@ -101,7 +104,7 @@ if __name__ == '__main__':
 	collection = DataFramesCollection()
 	collection.optimize(verbose=True)
 
-	print(collection.test_identity.head())
-	print(collection.train_identity.head())
+	for item in collection:
+		print(item.shape)
 else:
 	collection = DataFramesCollection()
