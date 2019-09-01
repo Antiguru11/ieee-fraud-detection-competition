@@ -1,13 +1,15 @@
 import os
 
-input_path = '../input/'
-submissions_path = '../output/'
-models_path = '../models/'
-tmp_path = '../temp/'
+base_path = 'd:\\Projects\\ml\\ieee-fraud-detection-competition\\'
+
+input_path = os.path.join(base_path, 'input')
+submissions_path = os.path.join(base_path, 'output')
+models_path = os.path.join(base_path, 'models')
+tmp_path = os.path.join(base_path, 'temp')
 
 task_type = 'classification'
 target_col = 'isFraud'
-target_col_vars = [0, 1]
+target_vars = {'Fraud': 1, 'Not fraud': 0}
 
 # train_transactions_path = os.path.join(input_path, 'train_transaction.csv')
 # train_identify_path = os.path.join(input_path, 'train_identity.csv')
