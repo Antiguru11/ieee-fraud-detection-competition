@@ -114,6 +114,9 @@ class DataFramesRepository(object):
 
 		print('Data is ready!')
 
+	def names(self):
+		return [i.name for i in self.data_frames]
+
 	def optimize(self, verbose=False):
 		print('Starting optimization DataFrames')
 		cnt = 0

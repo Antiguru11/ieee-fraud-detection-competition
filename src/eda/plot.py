@@ -3,43 +3,60 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import config
+import config as cfg
 from data import repository as rep
 
 
-def _get_data_frames(col_name):
-	dfs = []
-	for df in rep:
-		if col_name in df.columns:
-			dfs.append(df)
-	return dfs
+def cat_count(name, values=None, use=None, n_columns=3, **kwargs):
+	plt.figure(**kwargs)
+	if use is None or len(use) == 0:
+		use = rep.names()
 
+	if values is None or len(values) == 0:
+		map_func = lambda x: True
+	else:
+		map_func = lambda x: x in values
 
-def cat_count(col_name, figsize, nrows, ncols):
-	dfs = _get_data_frames(col_name)
-	plt.figure(figsize=figsize)
+	df_names = []
+	df_names_with_target = []
+	for df_name in use:
+		df = rep.__getattr__(df_name)
+		if name in df.columns:
+			df_names.append(df_name)
+			if cfg.target_col in df.columns:
+				df_names_with_target.append(df_name)
+
+	n_plots = len(df_names)
+	if cfg.task_type == 0:
+		n_plots += (len(cfg.target_vars) + 1) * len(df_names_with_target)
+	n_rows = np.ceil(n_plots / n_columns)
+
 	index = 1
-	for df in dfs:
-		plt.subplot(nrows, ncols, index)
-		ax = sns.countplot(x=col_name,
-		                   data=df)
-		ax.set_title('{0} in {1}'.format(col_name, df.name_))
+	for df_name in df_names:
+		df = rep.__getattr__(df_name)
+		plt.subplot(n_rows, n_columns, index)
+		ax = sns.countplot(x=name, data=df[df[name].apply(map_func)])
+		ax.set_title('{0} in {1}'.format(name, df.name_))
 		index += 1
 
-	for df in dfs:
-		if config.task_type == 'classification' and \
-		   config.target_col in df.columns:
-			for lbl, val in config.target_vars.items():
-				plt.subplot(nrows, ncols, index)
-				ax = sns.countplot(x=col_name,
-				                   data=df[df[config.target_col] == val])
-				ax.set_title('{0} in {1} - {2}'.format(col_name, df.name_, lbl))
+	if cfg.task_type == 0:
+		for df_name in df_names_with_target:
+			for lbl, val in cfg.target_vars.items():
+				df = rep.__getattr__(df_name)
+				plt.subplot(n_rows, n_columns, index)
+				ax = sns.countplot(x=name,
+				                   hue=cfg.target_col,
+				                   data=df[df[name].apply(map_func)][df[cfg.target_col] == val])
+				ax.set_title('{0} in {1} - {2}'.format(name, df.name_, lbl))
 				index += 1
-			plt.subplot(nrows, ncols, index)
-			ax = sns.countplot(x=col_name,
-			                   hue=config.target_col,
-			                   data=df)
-			ax.set_title('{0} in {1} by {2}'.format(col_name, df.name_, config.target_col))
+
+		for df_name in df_names_with_target:
+			df = rep.__getattr__(df_name)
+			plt.subplot(n_rows, n_columns, index)
+			ax = sns.countplot(x=name,
+			                   hue=cfg.target_col,
+			                   data=df[df[name].apply(map_func)])
+			ax.set_title('{0} in {1} by {2}'.format(name, df.name_, cfg.target_col))
 			index += 1
 
 	plt.show()
