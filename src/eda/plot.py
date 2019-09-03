@@ -12,10 +12,9 @@ def cat_count(name, values=None, use=None, n_columns=3, **kwargs):
 	if use is None or len(use) == 0:
 		use = rep.names()
 
+	total = False
 	if values is None or len(values) == 0:
-		map_func = lambda x: True
-	else:
-		map_func = lambda x: x in values
+		total = True
 
 	df_names = []
 	df_names_with_target = []
@@ -35,7 +34,7 @@ def cat_count(name, values=None, use=None, n_columns=3, **kwargs):
 	for df_name in df_names:
 		df = rep.__getattr__(df_name)
 		plt.subplot(n_rows, n_columns, index)
-		ax = sns.countplot(x=name, data=df[df[name].apply(map_func)])
+		ax = sns.countplot(x=name, data=df if total else df[df[name].isin(values)])
 		ax.set_title('{0} in {1}'.format(name, df.name_))
 		index += 1
 
@@ -45,17 +44,15 @@ def cat_count(name, values=None, use=None, n_columns=3, **kwargs):
 				df = rep.__getattr__(df_name)
 				plt.subplot(n_rows, n_columns, index)
 				ax = sns.countplot(x=name,
-				                   hue=cfg.target_col,
-				                   data=df[df[name].apply(map_func)][df[cfg.target_col] == val])
+				                   data=df[df[cfg.target_col] == val] if total else \
+					                    df[df[name].isin(values) & (df[cfg.target_col] == val)])
 				ax.set_title('{0} in {1} - {2}'.format(name, df.name_, lbl))
 				index += 1
 
 		for df_name in df_names_with_target:
 			df = rep.__getattr__(df_name)
 			plt.subplot(n_rows, n_columns, index)
-			ax = sns.countplot(x=name,
-			                   hue=cfg.target_col,
-			                   data=df[df[name].apply(map_func)])
+			ax = sns.countplot(x=name, hue=cfg.target_col, data=df if total else df[df[name].isin(values)])
 			ax.set_title('{0} in {1} by {2}'.format(name, df.name_, cfg.target_col))
 			index += 1
 

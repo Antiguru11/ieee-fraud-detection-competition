@@ -37,7 +37,6 @@ class DataFramesRepository(object):
 				                              '{0}_{1}.pickle'.format(OPT_FILE_PREFIX, self.name))
 				self.optimized = True
 
-
 		def read(self):
 			if self.optimized:
 				return pd.read_pickle(self.path)
@@ -89,6 +88,7 @@ class DataFramesRepository(object):
 				return None
 
 	def __init__(self, input_path, opt_path, bootstrap=False, exclude=None):
+		super().__init__()
 		if input_path is None or len(input_path) == 0:
 			print('Error, "input_path" variable is None or empty.')
 
