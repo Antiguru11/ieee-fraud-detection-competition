@@ -1,4 +1,3 @@
-import config as cfg
-from .data_frames_collection import DataFramesRepository
+from .data_frames_repository import DataFramesRepository
 
-repository = DataFramesRepository(cfg.input_path, cfg.tmp_path)
+repository = DataFramesRepository()
